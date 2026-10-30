@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f172a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Unity画像ビューア" />
+  <meta name="apple-mobile-web-app-title" content="Unityアセットビューア" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="apple-touch-icon" href="./icons/icon-180.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
@@ -171,14 +171,41 @@
       margin: 0; font-size: 1rem; flex: 1;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .lb-img-wrap {
+
+    .card .media-thumb {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 100%; aspect-ratio: 3/4; gap: 10px;
+      background: radial-gradient(circle at 30% 20%, #1e293b, #070b14 70%);
+      color: var(--text);
+    }
+    .card .media-thumb.audio { background: radial-gradient(circle at 30% 20%, #164e63, #070b14 70%); }
+    .card .media-thumb.video { background: radial-gradient(circle at 30% 20%, #312e81, #070b14 70%); }
+    .card .media-icon {
+      font-size: 2.4rem; line-height: 1; opacity: .95;
+      filter: drop-shadow(0 4px 12px rgba(56,189,248,.35));
+    }
+    .card .media-tag {
+      font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+      color: var(--muted); padding: 4px 10px; border-radius: 999px;
+      background: rgba(148,163,184,.12); border: 1px solid var(--border);
+    }
+    #lb-media-wrap {
       flex: 1; overflow: auto; -webkit-overflow-scrolling: touch;
       background: #05080f; border-radius: 12px; border: 1px solid var(--border);
-      text-align: center;
+      text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 180px; padding: 12px;
     }
-    #lb-img {
-      max-width: 100%; height: auto; vertical-align: middle;
+    #lb-media-wrap.is-image { padding: 0; }
+    #lb-img { max-width: 100%; height: auto; vertical-align: middle; }
+    #lb-audio, #lb-video { width: min(100%, 640px); max-width: 100%; outline: none; }
+    #lb-video { max-height: 70vh; background: #000; border-radius: 8px; }
+    #lb-warn {
+      margin: 8px 12px; padding: 10px 12px; border-radius: 10px;
+      background: rgba(251,113,133,.1); border: 1px solid rgba(251,113,133,.35);
+      color: #fecdd3; font-size: .82rem; line-height: 1.45; text-align: left;
     }
+    #lb-warn[hidden] { display: none !important; }
+
     #lb-info { margin-top: 8px; color: var(--muted); font-size: .8rem; text-align: center; word-break: break-all; }
     footer {
       margin: 28px 16px 0; text-align: center; color: var(--muted); font-size: .72rem; line-height: 1.5;
@@ -188,11 +215,11 @@
 <body>
   <header>
     <h1>Unity アセットバンドル ビューア</h1>
-    <p class="subtitle">端末内だけで解析します（サーバーへは送信しません）</p>
+    <p class="subtitle">端末内だけで画像・音声・動画を解析します（サーバーへは送信しません）</p>
   </header>
   <main>
     <div id="drop">
-      <p>UnityFS のアセットバンドル / フォルダ / ZIP<br>（.bin / .bundle / .ab など・複数可）</p>
+      <p>UnityFS のアセットバンドル / フォルダ / ZIP<br>（画像・音声・動画 · .bin / .bundle / .ab など・複数可）</p>
       <div class="row">
         <button type="button" id="pick-btn">ファイルを選ぶ</button>
         <button type="button" class="secondary" id="folder-btn" hidden>フォルダを選ぶ</button>
@@ -220,7 +247,7 @@
 
     <div id="empty">
       ここにサムネイルが表示されます。<br>
-      対応例: RGBA32 / ETC2 / ASTC / DXT など（端末デコード）
+      画像: RGBA32 / ETC2 / ASTC / DXT など · 音声: FSB5 (PCM / Vorbis / ADPCM) · 動画: MP4 など
     </div>
     <div id="grid" aria-live="polite"></div>
   </main>
@@ -233,8 +260,11 @@
         <button type="button" id="lb-download">PNG保存</button>
         <button type="button" class="secondary" id="lb-close">閉じる</button>
       </div>
-      <div class="lb-img-wrap">
-        <img id="lb-img" alt="" />
+      <div id="lb-media-wrap" class="lb-img-wrap">
+        <img id="lb-img" alt="" hidden />
+        <audio id="lb-audio" controls playsinline preload="metadata" hidden></audio>
+        <video id="lb-video" controls playsinline preload="metadata" hidden></video>
+        <div id="lb-warn" hidden></div>
       </div>
       <div id="lb-info"></div>
     </div>

@@ -1,8 +1,9 @@
 {
   "name": "Unity アセットバンドル ビューア",
-  "short_name": "Unity画像",
-  "description": "端末内で Unity AssetBundle の画像を表示・保存します",
+  "short_name": "Unityビューア",
+  "description": "端末内で Unity AssetBundle の画像・音声・動画を表示・再生・保存します",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0b1220",
   "theme_color": "#0f172a",
@@ -20,6 +21,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "scope": "./"
+  ]
 }

@@ -1,4 +1,4 @@
-const CACHE = "unity-viewer-v2";
+const CACHE = "unity-viewer-v3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,6 +9,7 @@ const ASSETS = [
   "./icons/icon-180.png",
   "./wasm/texture2ddecoder.js",
   "./wasm/texture2ddecoder.wasm",
+  "./assets/fmod_vorbis_setup_packets.bin",
 ];
 
 self.addEventListener("install", (event) => {
